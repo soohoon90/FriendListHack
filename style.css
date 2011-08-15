@@ -1,0 +1,151 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+body {
+    font-size: 14px;
+    line-height: 1.3;
+}
+ul{
+    list-style: none;
+    margin: 1em 0em 0em 2em;
+}
+p{
+    margin: 1em 0;
+}
+ol{
+    font-size: 1.5em;
+    margin: 1em 0em 0em 2em;
+}
+.marginal{
+    margin: 2em;
+    text-align: center;
+}
+.marginal table{
+    width: 400px;
+    margin: 1em auto;
+}
+#userName{
+    font-weight: bold;
+}
+body {
+  font-family: 'Lucida Grande', Verdana, Arial, sans-serif;
+  font-size: 10px;
+}
+
+.container{
+    padding: 2em;
+    margin: 25px auto;
+}
+
+.inner{
+    width: 500px;
+    border: 1px solid #666;
+    border-radius: 1em;
+}
+.warn{
+    text-align: center;
+    display: block;
+    width: 300px;
+    padding: 1em;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #7A162F;
+    margin: 2em auto;
+    background-color: #F089A2;
+    border: 1px solid #7A162F;
+    border-radius: 1em;
+}
+.yellow{
+    background-color: #FFD;
+    border: 1px solid #DA8;
+}
+
+#pageContainer{
+    font-size: 10px;
+    color: #5A9;
+    width: 700px;
+}
+#loginContainer{
+    text-align: center;
+}
+#headerContainer{
+    text-align: center;
+}
+#pageContainer h1{
+    font-size: 2em;
+    margin: 0.5em 0;
+    padding: 0;
+    font-weight: bold;
+}
+
+#pageContainer h2{
+    font-size: 1.8em;
+    margin: 0.5em 0;
+    font-weight: bold;
+}
+
+#pageContainer h3{
+    font-size: 1.6em;
+}
+
+#infoContainer{
+    display: none;
+}
+
+#infoContainer p{
+    font-size: 1.3em;
+}
+
+#friendListContainer{
+    display: none;
+}
+#audienceContainer{
+    display: none;
+}
+#profilePictureContainer{
+    width: 200px;
+    margin: 1em auto;
+}
+#profilePictureContainer img{
+    height: 200px;
+}
+#profileNameContainer{
+    margin: 1em auto;
+    text-align: center;
+    font-size: 42px;
+}
+#friendContainer{
+    display: none;
+}
+#sortingInfoContainer{
+    text-align: center;
+    margin: 1em;
+    font-weight: bold;
+}
+#sortButtonContainer{
+    text-align: center;
+}
+.container .button{
+    margin: 0.3em;
+}
+#otherButtonContainer{
+    text-align: center;
+    margin: 1em;
+}
