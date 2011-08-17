@@ -1,23 +1,3 @@
-(function($){
-  $.fn.shuffle = function() {
-    return this.each(function(){
-      var items = $(this).children();
-      return (items.length)
-        ? $(this).html($.shuffle(items))
-        : this;
-    });
-  }
-
-  $.shuffle = function(arr) {
-    for(
-      var j, x, i = arr.length; i;
-      j = parseInt(Math.random() * i),
-      x = arr[--i], arr[i] = arr[j], arr[j] = x
-    );
-    return arr;
-  }
-})(jQuery);
-
 function FriendListHack() {
     var DEBUG = false;
     var APP_ID = "156596367751193";
@@ -38,7 +18,6 @@ function FriendListHack() {
     var _sorted = [];
     var _allFriendsInLists = [];
     var _allFriendsNotInLists = [];
-    var _pickedLists = [];
 
     var _currentPerson;
     var _nextPerson;
@@ -105,29 +84,54 @@ function FriendListHack() {
         console.log("setting audience");
         // _audience = _friends;
 
-        var _tempFriends = _guys;
-        $.merge(_tempFriends, _girls);
+        var _tempAllFriends = _.union(_guys, _girls);
 
         $(_friendlists).each(function(){
-            $.merge(_allFriendsInLists, this.members);
+            _allFriendsInLists = _.union(_allFriendsInLists,this.members);
+
         });
 
-        _allFriendsNotInLists = _.difference(_tempFriends, _allFriendsInLists);
+        _allFriendsNotInLists = differenceByID(_tempAllFriends, _allFriendsInLists);
 
-        if ($("#listed input:checked").val() == "not"){
-            console.log("not in list only")
-            _tempFriends = _allFriendsNotInLists;
+        // console.log("all, in, not, in+not")
+        // console.log(_tempAllFriends.length);
+        // console.log(_allFriendsInLists.length);
+        // console.log(_allFriendsNotInLists.length);
+        // console.log(_allFriendsInLists.length + _allFriendsNotInLists.length);
+        // console.log(differenceByID(_tempAllFriends, _allFriendsNotInLists).length);
+
+        _audience = _tempAllFriends;
+
+        var listed = $("#listed input:checked").val();
+        var gender = $("#gender input:checked").val();
+
+        if (listed == "notany"){
+            _audience = _allFriendsNotInLists;
+        }else if(listed == "notpicked"){
+           $('a[datapicked="true"]').each(function(){
+             var id = $(this).attr('dataid');
+
+             if (getByID(_friendlists, id)){
+               var friendlist = getByID(_friendlists, id);
+               console.log(friendlist);
+               _audience = differenceByID(_audience, friendlist);
+             }else{
+               console.log("WTF");
+             }
+           });
         }
 
-        if ($("#gender input:checked").val() == "guys"){
-            console.log("guys only")
-            _tempFriends = _.intersection(_tempFriends, _guys);
-        }else if ($("#gender input:checked").val() == "girls"){
-            console.log("girls only")
-            _tempFriends = _.intersection(_tempFriends, _girls);
+        if (gender == "guys"){
+          console.log(_audience.length);
+          _audience = intersectionByID(_audience, _guys);
+          console.log(_audience.length);
+        }else if (gender == "girls"){
+          console.log(_audience.length);
+          _audience = intersectionByID(_audience, _girls);
+          console.log(_audience.length);
         }
-        _audience = $.shuffle(_tempFriends);
 
+        _audience = $.shuffle(_audience);
     }
 
     /***********************************************
@@ -209,7 +213,6 @@ function FriendListHack() {
     };
 
     function addRowToTableInID(friendlist, id){
-
         var pickButton = $(document.createElement("a"))
             .attr({href:"",
                 dataid:friendlist.id,
@@ -250,7 +253,6 @@ function FriendListHack() {
             .html(friendlist.name)
             .appendTo(id);
     }
-
 
     function addAudienceSelectToID(friendlist, id){
         var newCheckBox = $(document.createElement("input"))
@@ -330,7 +332,21 @@ function FriendListHack() {
             var friendlistid = event.currentTarget.attributes['dataId'].value;
             var friendlistname = event.currentTarget.attributes['dataName'].value;
             var url = "https://graph.facebook.com/"+friendlistid+"/members/"+_currentPerson.id;
-            $.post(url+'?access_token='+_accessToken);
+            // url += '?access_token='+_accessToken;
+            $.ajax({
+               type: "POST",
+               url: url,
+               data: {access_token: _accessToken},
+               timeout: 2000,
+               success: function(msg){
+                 console.log(msg);
+               },
+               error: function(msg){
+                 console.log(msg);
+                 //loadFriendLists();
+               },
+               dataType: "jsonp"
+             });
         }
         showNextPerson();
         return false;
@@ -341,9 +357,10 @@ function FriendListHack() {
         var friendlistname = event.currentTarget.attributes['dataName'].value;
         var answer = confirm("Do you really want to delete "+friendlistname+"?");
         if (answer){
-            $.post("https://graph.facebook.com/"+friendlistid+'/?method=DELETE&access_token='+_accessToken);
+            var url = "https://graph.facebook.com/"+friendlistid+'/?method=DELETE&access_token='+_accessToken;
+            $.post(url, "jsonp");
             $(event.currentTarget).fadeOut('fast', function(){
-                $(this).remove();
+                loadFriendLists();
             });
         }
         return false;
@@ -364,7 +381,7 @@ function FriendListHack() {
                     var keyNum = e.which-49;
                     console.log($("#sortButtonContainer").children().length+"..."+keyNum);
                     if ($("#sortButtonContainer").children().length > keyNum){
-                        $("#sortButtonContainer").children()[keyNum].click();
+                        $("#sortButtonContainer").children().get(keyNum).click();
                     }
                 }
                 break;
@@ -439,13 +456,17 @@ function FriendListHack() {
             return false;
         });
         $("#doneListButton").click(function() {
-            _state = 2;
-            console.log("hiding friendListContainer");
-            console.log("showing audienceContainer");
-            $("#friendListContainer").fadeOut('fast');
-            $("#audienceContainer").fadeIn('slow');
-            _currentButton = $("#doneAudienceButton");
-            addPickedSortButtons();
+            if ($('a[datapicked="true"]').length < 2){
+              alert('You need at least 2 friend lists to sort into silly :)')
+            }else{
+              _state = 2;
+              console.log("hiding friendListContainer");
+              console.log("showing audienceContainer");
+              $("#friendListContainer").fadeOut('fast');
+              $("#audienceContainer").fadeIn('slow');
+              _currentButton = $("#doneAudienceButton");
+              addPickedSortButtons();
+            }
             return false;
         });
         $("#doneAudienceButton").click(function() {
@@ -459,12 +480,22 @@ function FriendListHack() {
         });
         $("#addNewFriendListButton").click(function() {
             var s = prompt('New Friend List name');
-            var url = "https://graph.facebook.com/me/friendlists/";
-            $.post(url+'?access_token='+_accessToken, {name:s}, function(data){
-                console.log(data);
-                loadFriendLists();
-            });
-            console.log("adding new friendlist "+ s);
+            if (s){
+              var url = "https://graph.facebook.com/me/friendlists/";
+              $("#friendListTable").html("loading...");
+              $.ajax({
+                 type: "POST",
+                 url: url+'?access_token='+_accessToken,
+                 data: {name:s},
+                 timeout: 2000,
+                 success: function(msg){
+                   alert( "Data Saved: " + msg );
+                 },
+                 error: function(msg){
+                   loadFriendLists();
+                 }
+               });
+            }
             return false;
         });
         $("#addNewFriendListWhileButton").click(function() {
