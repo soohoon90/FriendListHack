@@ -4,16 +4,16 @@
     <script src="http://connect.facebook.net/en_US/all.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-    <script src="underscore-min.js"></script>
-    <script src="friendlisthack.js"></script>
-    <link rel='stylesheet' href='button.css' />
-    <link rel='stylesheet' href='style.css' />
+    <script src="js/underscore-min.js"></script>
+    <script src="js/friendlisthack.js"></script>
+    <link rel='stylesheet' href='css/button.css' />
+    <link rel='stylesheet' href='css/style.css' />
   </head>
 
   <body>
     <div id="pageContainer" class="container">
       <div id="headerContainer">
-        <img id="logoImage" src="friendlisthack.png">
+        <img id="logoImage" src="img/friendlisthack.png">
         <h1>Friend List Hack</h1>
       </div>
       <div id="fb-root">
